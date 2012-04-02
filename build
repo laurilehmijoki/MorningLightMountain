@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+BUILD_DIR=.build
+rm -rf $BUILD_DIR && mkdir $BUILD_DIR
+
+echo "Building the Scalatron bot..."
+
+scalac -sourcepath src -d $BUILD_DIR `find src -name *.scala`
+
+cd $BUILD_DIR
+
+jar -cfm ../bin/ScalatronBot.jar ../MANIFEST.MF *.*
+
+cd ..
+
+echo "...ready!"
+echo "Produced bin/ScalatronBot.jar"
