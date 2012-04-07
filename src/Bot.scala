@@ -11,17 +11,19 @@ class Bot {
 
   def respond(input: String) = {
     val (opcode, params) = CommandParser(input)
-    opcode match {
+    val (movementStrategy, response) = opcode match {
       case "React" =>
         val view = View(params("view"))
         consultMovementStrategies(view = view) 
       case _ =>
-        ""
+        (None, "")
     }
+    "Status(text=%s)|%s".format(movementStrategy.getClass.getSimpleName, response)
   }
 
-  private def consultMovementStrategies(strategyIndex: Int = 0, view: View): String = {
-    val response = movementStrategies(strategyIndex).nextMove(view)
-    if (response.isDefined) response.get else consultMovementStrategies(strategyIndex + 1, view)
+  private def consultMovementStrategies(strategyIndex: Int = 0, view: View): Tuple2[MovementStrategy, String] = {
+    val movementStrategy = movementStrategies(strategyIndex)
+    val response = movementStrategy.nextMove(view)
+    if (response.isDefined) (movementStrategy, response.get) else consultMovementStrategies(strategyIndex + 1, view)
   }
 }
