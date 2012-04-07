@@ -40,11 +40,12 @@ object MovementStrategy {
     Some("Move(dx=%d,dy=%d)".format(xy.x, xy.y))
 
   private class MovementStrategyGatherer extends MovementStrategy {
-    def respond(input: View): Option[String] = {
-        input.offsetToNearest('P') match {
+    def respond(view: View): Option[String] = {
+        view.offsetToNearest('P') match {
         case Some(offset) =>
           val offsetSignum = offset.signum
-          someMovement(offsetSignum)
+          if (view.cellAtRelPos(offsetSignum) == 'W') None // Don't rush against wall
+          else someMovement(offsetSignum)
         case None =>
           None 
       }
@@ -54,14 +55,14 @@ object MovementStrategy {
   private class MovementStrategyMeanderer extends MovementStrategy {
     var direction: XY = XY.Right
 
-    def respond(input: View): Option[String] = {
-      val newOffset = nextDirection(input)
+    def respond(view: View): Option[String] = {
+      val newOffset = nextDirection(view)
       someMovement(newOffset)
     }
 
-    private def nextDirection(input: View) = {
-      if (input.cellAtRelPos(direction) == 'W')
-        direction = randomSafeDirection(input)
+    private def nextDirection(view: View) = {
+      if (view.cellAtRelPos(direction) == 'W')
+        direction = randomSafeDirection(view)
 
       direction
     }
