@@ -5,52 +5,70 @@ class ControlFunctionFactory {
 }
 
 class Bot {
+  val movementStrategies = List(
+    MovementStrategy.gatherer,
+    MovementStrategy.meanderer
+  )
+
   def respond(input: String) = {
     val (opcode, params) = CommandParser(input)
 
     opcode match {
       case "React" =>
         val view = View(params("view"))
-        MovementStrategyGatherer.respondOpt(view) match {
-          case Some(response) => response
-          case None => MovementStrategyMeander.respond(view)
-        }
+        consultMovementStrategies(view = view) 
       case _ =>
         ""
     }
   }
+
+  private def consultMovementStrategies(strategyIndex: Int = 0, view: View): String = {
+    val response = movementStrategies(strategyIndex).respond(view)
+    if (response.isDefined) response.get else consultMovementStrategies(strategyIndex + 1, view)
+  }
 }
 
-object MovementStrategyGatherer {
-  def respondOpt(input: View): Option[String] = {
-      input.offsetToNearest('P') match {
-      case Some(offset) =>
-        val offsetSignum = offset.signum
-        Some("Move(dx=%d,dy=%d)".format(offsetSignum.x, offsetSignum.y))
-      case None =>
-        None 
+abstract class MovementStrategy {
+  def respond(input: View): Option[String]
+}
+
+object MovementStrategy {
+  def meanderer: MovementStrategy = new MovementStrategyMeanderer
+  def gatherer: MovementStrategy = new MovementStrategyGatherer
+
+  private def someMovement(xy: XY) = 
+    Some("Move(dx=%d,dy=%d)".format(xy.x, xy.y))
+
+  private class MovementStrategyGatherer extends MovementStrategy {
+    def respond(input: View): Option[String] = {
+        input.offsetToNearest('P') match {
+        case Some(offset) =>
+          val offsetSignum = offset.signum
+          someMovement(offsetSignum)
+        case None =>
+          None 
+      }
     }
   }
-}
 
-object MovementStrategyMeander {
-  
-  var direction: XY = XY.Right
+  private class MovementStrategyMeanderer extends MovementStrategy {
+    var direction: XY = XY.Right
 
-  def respond(input: View): String = {
-    val newOffset = nextDirection(input)
-    "Move(dx=%d,dy=%d)".format(newOffset.x, newOffset.y)
-  }
+    def respond(input: View): Option[String] = {
+      val newOffset = nextDirection(input)
+      someMovement(newOffset)
+    }
 
-  private def nextDirection(input: View) = {
-    if (input.cellAtRelPos(direction) == 'W')
-      direction = randomSafeDirection(input)
+    private def nextDirection(input: View) = {
+      if (input.cellAtRelPos(direction) == 'W')
+        direction = randomSafeDirection(input)
 
-    direction
-  }
+      direction
+    }
 
-  private def randomSafeDirection(view: View): XY = {
-    val safeCells = view.emptyCellsAround
-    safeCells(new Random().nextInt(safeCells.length))
+    private def randomSafeDirection(view: View): XY = {
+      val safeCells = view.emptyCellsAround
+      safeCells(new Random().nextInt(safeCells.length))
+    }
   }
 }
