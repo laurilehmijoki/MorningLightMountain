@@ -19,7 +19,7 @@ object XY {
   val Down = XY( 0,-1)
   val DownRight = XY( 1,-1)
 
-  val AllDirections = List(Right, Up, Left, Down) // All the directions to which the bot can move
+  val AllDirections = List(Right, RightUp, Up, UpLeft, Left, LeftDown, Down, DownRight) // All the directions to which the bot can move
 }
 
 case class XY(val x: Int, val y: Int) {
