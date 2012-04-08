@@ -1,5 +1,3 @@
-import util.Random
-
 abstract class MovementStrategy {
   def nextMove(input: View): Option[String]
 
@@ -39,6 +37,8 @@ object MovementStrategy {
   private class MovementStrategyHunter extends AttractedTo with FluppetHunter 
 
   private class MovementStrategyMeanderer extends MovementStrategy {
+    import util.Random
+
     var direction: XY = XY.Right
 
     def nextMove(view: View): Option[String] = {
