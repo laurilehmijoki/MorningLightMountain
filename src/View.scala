@@ -1,3 +1,5 @@
+import util.Random
+
 case class View(cells: String) {
   val size = math.sqrt(cells.length).toInt
   val center = XY(size/2, size/2)
@@ -11,8 +13,13 @@ case class View(cells: String) {
   def relPosFromIndex(index: Int) = relPosFromAbsPos(absPosFromIndex(index))
   def cellAtRelPos(relPos: XY) = cells.charAt(indexFromRelPos(relPos))
 
-  def emptyCellsAround(): List[XY] = {
+  def safeCellsAround(): List[XY] = {
     XY.AllDirections.filter(direction => cellAtRelPos(direction) == '_')   
+  }
+
+  def randomSafeDirection(): XY = {
+    val safeCells = safeCellsAround
+    safeCells(new Random().nextInt(safeCells.length))
   }
 
   def offsetToNearest(c: Char) = {
