@@ -4,8 +4,7 @@ class ControlFunctionFactory {
 
 class Bot {
   val movementStrategies = List(
-    MovementStrategy.hunter,
-    MovementStrategy.gatherer,
+    MovementStrategy.hunterGatherer,
     MovementStrategy.meanderer
   )
 
