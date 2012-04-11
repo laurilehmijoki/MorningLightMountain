@@ -1,7 +1,3 @@
-class ControlFunctionFactory {
-  def create = new Bot().respond _
-}
-
 class Bot {
   val movementStrategies = List(
     MovementStrategy.hunterGatherer,
